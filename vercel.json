@@ -1,0 +1,20 @@
+{
+    "version": 2,
+    "builds": [
+      {
+        "src": "server.js",
+        "use": "@vercel/node"
+      }
+    ],
+    "routes": [
+      {
+        "src": "/webtoon",
+        "dest": "/api/index.js"
+      },
+      {
+        "src": "/chapters",
+        "dest": "/api/index.js"
+      }
+    ]
+  }
+  
