@@ -6,7 +6,12 @@ import getManhwaChapters from "./scrape-chapters.js";
 const app = express();
 const port = 3001;
 
-app.use(cors());
+const corsOptions = {
+    origin: 'http://localhost:3000/webtoon', // Your Next.js app's origin
+    optionsSuccessStatus: 200
+};
+
+app.use(cors(corsOptions));
 
 app.get('/', (req, res) => {
     res.send("Server is Running OK!");
