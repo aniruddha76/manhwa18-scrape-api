@@ -9,11 +9,11 @@
     "routes": [
       {
         "src": "/webtoon",
-        "dest": "/api/index.js"
+        "dest": "/api/server.js"
       },
       {
         "src": "/chapters",
-        "dest": "/api/index.js"
+        "dest": "/api/server.js"
       }
     ]
   }
