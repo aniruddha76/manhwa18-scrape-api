@@ -6,10 +6,7 @@ import getManhwaChapters from "./scrape-chapters.js";
 const app = express();
 const port = 3001;
 
-// app.use(cors());
-app.use(cors({
-    origin: 'http://localhost:3000', // Replace with your front-end URL in production
-}));
+app.use(cors());
 
 app.get('/', (req, res) => {
     res.send("Server is Running OK!");
