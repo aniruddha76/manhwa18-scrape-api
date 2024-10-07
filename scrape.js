@@ -57,7 +57,7 @@ export default async function getManhwa(searchQuery) {
         
     } catch (error) {
         if (error.response && error.response.status === 404) {
-            return { message: "Yo! Whatever you're searching ain't here!" };
+            return { title: "Yo! Whatever you're searching ain't here!" };
         } else {
             console.error("Error fetching the webpage:", error);
             return { message: "An error occurred while fetching data." };
