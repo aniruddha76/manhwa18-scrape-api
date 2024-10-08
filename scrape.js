@@ -10,7 +10,8 @@ export default async function getManhwa(searchQuery) {
             .replace(/&hellip;/g, "…") // ellipsis
             .replace(/&amp;/g, "&") // ampersand
             .replace(/&lt;/g, "<") // less than symbol
-            .replace(/&gt;/g, ">"); // greater than symbol
+            .replace(/&gt;/g, ">") // greater than symbol
+            .replace(/&nbsp;/g, " "); // non-breaking space
     };
 
     const nameToSearch = searchQuery.replace(/ /g, "-");
@@ -19,13 +20,15 @@ export default async function getManhwa(searchQuery) {
         const response = await axios.get(`https://manhwa18.cc/webtoon/${nameToSearch}`);
         const mangaData = response.data;
 
-        // Regular expression to extract manga data
+        // Regular expressions to extract the data
         const mangaTitle = /<h1>\s*<span>.*?<\/span>\s*([^<]+)\s*<\/h1>/;
         const mangaImage = /<div class="summary_image">\s*<a href=".*?" title=".*?">\s*<img[^>]+src="([^"]+)"[^>]*>\s*<\/a>\s*<\/div>/;
-        const mangaSummary = /<div class="panel-story-description">\s*<h2 class="manga-panel-title wleft">.*?<\/h2>\s*<div class="dsct">\s*<p>(.*?)<\/p>\s*<\/div>\s*<\/div>/;
+        const mangaSummary = /<div class="panel-story-description">\s*<h2 class="manga-panel-title wleft">.*?<\/h2>\s*<div class="dsct">\s*((?:<p>.*?<\/p>\s*)+)<\/div>\s*<\/div>/;
         const mangaChapters = /<a class="chapter-name text-nowrap" href=".*?" title=".*?">(Chapter \d+)<\/a>/g;
-        const mangaAuthor = /<div class="author-content">\s*<a href=".*?" rel="tag">(.*?)<\/a>\s*<\/div>/;
-        const mangaArtist = /<div class="artist-content">\s*<a href=".*?" rel="tag">(.*?)<\/a>\s*<\/div>/;
+
+        // Specifically target only the author/artist <a> tags
+        const mangaAuthor = /<div class="author-content">\s*((?:<a href=".*?" rel="tag">[^<]+<\/a>\s*)+)<\/div>/;
+        const mangaArtist = /<div class="artist-content">\s*((?:<a href=".*?" rel="tag">[^<]+<\/a>\s*)+)<\/div>/;
 
         const titleMatch = mangaData.match(mangaTitle);
         const imageMatch = mangaData.match(mangaImage);
@@ -37,12 +40,20 @@ export default async function getManhwa(searchQuery) {
         if (titleMatch) {
             const title = titleMatch[1].trim();
             const image = imageMatch[1].trim();
-            const author = authorMatch[1].trim();
-            const artist = artistMatch[1].trim();
-            const summary = decodeHtmlEntities(summaryMatch[1].trim());
+
+            // Process authors and artists, ensuring we only get names from the <a> tags
+            const author = authorMatch ? [...authorMatch[1].matchAll(/<a href=".*?" rel="tag">([^<]+)<\/a>/g)].map(match => match[1].trim()).join("/") : "Unknown";
+            const artist = artistMatch ? [...artistMatch[1].matchAll(/<a href=".*?" rel="tag">([^<]+)<\/a>/g)].map(match => match[1].trim()).join("/") : "Unknown";
+
+            //clean up the summary
+            const summary = summaryMatch ? decodeHtmlEntities(summaryMatch[1].replace(/<\/?[^>]+(>|$)/g, "").trim()) : "No summary available.";
+            
+            //chapter list array
             const chapters = chaptersMatch.map(match => match[1].trim());
 
-            // Returning data in object format
+            console.log("author: " + author, "\nartist: " + artist, "\nsummary: " + summary);
+
+            // Return the final data in object format
             return {
                 title: title,
                 image: image,
