@@ -29,6 +29,8 @@ app.get('/webtoon', async (req, res) => {
     }
 });
 
+app.options('/chapters', cors()); // Explicitly enable CORS for preflight
+
 app.get('/chapters', async (req, res) => {
     const searchQuery = req.query.search; // Get the search term from the query string
     const manhwaName = searchQuery.split(" ")[0];
