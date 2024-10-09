@@ -23,6 +23,7 @@ export default async function getManhwa(searchQuery) {
         // Regular expressions to extract the data
         const mangaTitle = /<h1>\s*<span>.*?<\/span>\s*([^<]+)\s*<\/h1>/;
         const mangaImage = /<div class="summary_image">\s*<a href=".*?" title=".*?">\s*<img[^>]+src="([^"]+)"[^>]*>\s*<\/a>\s*<\/div>/;
+        const mangaImageAndHref = /<div class="summary_image">\s*<a href="([^"]+)" title=".*?">\s*<img[^>]+src="([^"]+)"[^>]*>\s*<\/a>\s*<\/div>/;
         const mangaSummary = /<div class="panel-story-description">\s*<h2 class="manga-panel-title wleft">.*?<\/h2>\s*<div class="dsct">\s*((?:<p>.*?<\/p>\s*)+)<\/div>\s*<\/div>/;
         const mangaChapters = /<a class="chapter-name text-nowrap" href=".*?" title=".*?">(Chapter \d+)<\/a>/g;
 
@@ -32,6 +33,7 @@ export default async function getManhwa(searchQuery) {
 
         const titleMatch = mangaData.match(mangaTitle);
         const imageMatch = mangaData.match(mangaImage);
+        const imageAndHrefMatch = mangaData.match(mangaImageAndHref);
         const authorMatch = mangaData.match(mangaAuthor);
         const artistMatch = mangaData.match(mangaArtist);
         const summaryMatch = mangaData.match(mangaSummary);
@@ -40,6 +42,7 @@ export default async function getManhwa(searchQuery) {
         if (titleMatch) {
             const title = titleMatch[1].trim();
             const image = imageMatch[1].trim();
+            const href = imageAndHrefMatch[1].trim().split("/")[2];
 
             // Process authors and artists, ensuring we only get names from the <a> tags
             const author = authorMatch ? [...authorMatch[1].matchAll(/<a href=".*?" rel="tag">([^<]+)<\/a>/g)].map(match => match[1].trim()).join("/") : "Unknown";
@@ -51,12 +54,10 @@ export default async function getManhwa(searchQuery) {
             //chapter list array
             const chapters = chaptersMatch.map(match => match[1].trim());
 
-            console.log("author: " + author, "\nartist: " + artist, "\nsummary: " + summary);
-
-            // Return the final data in object format
             return {
                 title: title,
                 image: image,
+                slug: href,
                 author: author,
                 artist: artist,
                 summary: summary,
