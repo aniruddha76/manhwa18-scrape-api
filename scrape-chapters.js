@@ -33,7 +33,7 @@ export default async function getManhwaChapters(manhwaName, chapter, retries = 5
             const imgRegex = /<img[^>]+(?:src|data-src)="(https:\/\/img\d{2}\.mnhwa002\.xyz\/uploads\/[^">]+)"/g;
             let imgMatch;
 
-            const chapterRegex = /<option[^>]+data-c="([^"]+)">([^<]+)<\/option>/g;
+            const chapterRegex = /<option[^>]+data-c="([^"]+)"[^>]*>([^<]+)<\/option>/g;
             let chapterMatch;
 
             // Collect chapter pages
